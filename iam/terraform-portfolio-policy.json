@@ -1,0 +1,60 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SiteBucket",
+      "Effect": "Allow",
+      "Action": ["s3:Get*", "s3:List*", "s3:PutBucketPolicy", "s3:PutBucketPublicAccessBlock", "s3:PutBucketTagging"],
+      "Resource": "arn:aws:s3:::joonheouk.cloud"
+    },
+    {
+      "Sid": "SiteObjects",
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::joonheouk.cloud/*"
+    },
+    {
+      "Sid": "Distribution",
+      "Effect": "Allow",
+      "Action": [
+        "cloudfront:GetDistribution", "cloudfront:GetDistributionConfig", "cloudfront:UpdateDistribution",
+        "cloudfront:ListTagsForResource", "cloudfront:TagResource", "cloudfront:UntagResource",
+        "cloudfront:CreateInvalidation", "cloudfront:GetInvalidation", "cloudfront:ListInvalidations"
+      ],
+      "Resource": "arn:aws:cloudfront::727244434299:distribution/E1NNI4T8V6DW3U"
+    },
+    {
+      "Sid": "OriginAccessControl",
+      "Effect": "Allow",
+      "Action": ["cloudfront:GetOriginAccessControl", "cloudfront:GetOriginAccessControlConfig", "cloudfront:UpdateOriginAccessControl"],
+      "Resource": "arn:aws:cloudfront::727244434299:origin-access-control/E1E0YLQRT5M9L9"
+    },
+    {
+      "Sid": "ReadManagedCachePolicies",
+      "Effect": "Allow",
+      "Action": ["cloudfront:ListCachePolicies", "cloudfront:GetCachePolicy"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "Certificate",
+      "Effect": "Allow",
+      "Action": ["acm:DescribeCertificate", "acm:ListTagsForCertificate", "acm:GetCertificate"],
+      "Resource": "arn:aws:acm:us-east-1:727244434299:certificate/5fe0856c-2ee7-4807-9f94-cb71e64af245"
+    },
+    {
+      "Sid": "HostedZone",
+      "Effect": "Allow",
+      "Action": [
+        "route53:GetHostedZone", "route53:ListResourceRecordSets", "route53:ChangeResourceRecordSets",
+        "route53:ListTagsForResource", "route53:ChangeTagsForResource"
+      ],
+      "Resource": "arn:aws:route53:::hostedzone/Z0060154JHPH7N3OYCK4"
+    },
+    {
+      "Sid": "DnsChangeStatus",
+      "Effect": "Allow",
+      "Action": "route53:GetChange",
+      "Resource": "arn:aws:route53:::change/*"
+    }
+  ]
+}
