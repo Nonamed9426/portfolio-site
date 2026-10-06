@@ -1,0 +1,48 @@
+name: deploy-site
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**"]
+  workflow_dispatch:
+
+# OIDC 토큰 발급에 필요. 그 외엔 저장소 읽기만
+permissions:
+  id-token: write
+  contents: read
+
+# 배포가 겹치지 않게 하나씩
+concurrency:
+  group: deploy-site
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Guard against empty site
+        run: test -s site/index.html
+
+      - name: Get temporary AWS credentials (OIDC, no stored keys)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::727244434299:role/portfolio-site-deploy-github
+          aws-region: ap-northeast-2
+
+      - name: Sync site to S3
+        run: aws s3 sync site/ s3://joonheouk.cloud --delete
+
+      - name: Invalidate CloudFront cache
+        run: |
+          id=$(aws cloudfront create-invalidation --distribution-id E1NNI4T8V6DW3U --paths "/*" --query Invalidation.Id --output text)
+          echo "invalidation: $id"
+          aws cloudfront wait invalidation-completed --distribution-id E1NNI4T8V6DW3U --id "$id"
+
+      - name: Verify deployed page matches repository
+        run: |
+          expected=$(stat -c%s site/index.html)
+          actual=$(curl -sS -o /dev/null -w '%{size_download}' https://joonheouk.cloud/)
+          echo "expected=$expected actual=$actual"
+          test "$expected" = "$actual"
